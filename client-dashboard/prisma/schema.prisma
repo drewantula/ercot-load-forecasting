@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Client {
+  id              String    @id @default(cuid())
+  companyName     String
+  contactName     String
+  contactEmail    String?
+  contactPhone    String?
+  industry        String?
+  dealSize        Float?
+  stage           String    @default("Discovery")
+  priority        String    @default("Medium")
+  internalDueDate DateTime?
+  notes           String?
+  solutions       String    @default("[]")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  meetingNotes MeetingNote[]
+  actionItems  ActionItem[]
+}
+
+model MeetingNote {
+  id              String   @id @default(cuid())
+  clientId        String
+  meetingDate     DateTime @default(now())
+  rawNotes        String
+  salesforceNotes String?
+  summary         String?
+  createdAt       DateTime @default(now())
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+model ActionItem {
+  id          String    @id @default(cuid())
+  clientId    String
+  description String
+  dueDate     DateTime?
+  completed   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
